@@ -52,7 +52,7 @@ namespace TetrisNet.Classes {
             }
 
             parent.KeyDown += (object s, KeyEventArgs e) => {
-                if(suspendGameLoop) return;
+                if(suspendGameLoop || gameOver) return;
 
                 switch(e.KeyCode) {
                     case Keys.Left:
@@ -63,6 +63,9 @@ namespace TetrisNet.Classes {
                         break;
                     case Keys.Down:
                         MoveDown();
+                        break;
+                    case Keys.Space:
+                        Task.Run(() => { while(MoveDown()) Thread.Sleep(30); });
                         break;
                     case Keys.Up:
                         activePiece.Move(Piece.Directions.Rotate);
@@ -137,10 +140,11 @@ namespace TetrisNet.Classes {
             return true;
         }
 
-        private void MoveDown() {
-            if(activePiece == null) return;
+        private bool MoveDown() {
+            if(activePiece == null) return false;
             if(CanMove(Piece.Directions.Down)) {
                 activePiece.Move(Piece.Directions.Down);
+                return true;
             } else {
                 for(int x = activePiece.Area.Left; x <= activePiece.Area.Right; x++) {
                     for(int y = activePiece.Area.Top; y <= activePiece.Area.Bottom; y++) {
@@ -154,6 +158,7 @@ namespace TetrisNet.Classes {
                 AddNewRandomPiece();
                 Task.Run(() => CheckFullLines());
             }
+            return false;
         }
 
         private void CheckFullLines() {
