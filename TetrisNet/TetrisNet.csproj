@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SimpleSynth">
+      <HintPath>..\..\PianoBizarre\Release\SimpleSynth.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,8 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Board.cs" />
-    <Compile Include="Classes\Piece.cs" />
+    <Compile Include="Game\Audio\AudioSupport.cs" />
+    <Compile Include="Game\Logic\Board.cs" />
+    <Compile Include="Game\Logic\Piece.cs" />
+    <Compile Include="Game\Audio\ThemeMusic.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>

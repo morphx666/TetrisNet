@@ -25,6 +25,8 @@ namespace TetrisNet {
         private void FormMain_Load(object sender, EventArgs e) {
             board = new Board(this, 12, -1, 48, 48);
 
+            this.FormClosing += (object s1, FormClosingEventArgs e1) => board.Dispose();
+
             Thread render = new Thread(() => {
                 while(true) {
                     Thread.Sleep(30);

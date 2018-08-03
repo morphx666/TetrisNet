@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TetrisNet.Classes {
-    public class Board {
+    public partial class Board : IDisposable {
         public int GridWidth;
         public int GridHeight;
         public int BlockWidth;
@@ -45,6 +45,8 @@ namespace TetrisNet.Classes {
             }
             BlockWidth = blockWidth;
             BlockHeight = blockHeight;
+
+            InitAudioService();
 
             Cells = new Cell[GridWidth][];
             for(int x = 0; x < GridWidth; x++) {
@@ -95,6 +97,7 @@ namespace TetrisNet.Classes {
 
             Thread gameLoop = new Thread(() => {
                 ShowBanner($"LEVEL {gameLevel}");
+                StartThemeMusic();
 
                 while(!gameOver) {
                     Thread.Sleep(gameLoopsDelays[gameLevel - 1]);
@@ -278,6 +281,10 @@ namespace TetrisNet.Classes {
                 }
                 g.DrawString(banner, gameFont, Brushes.Gainsboro, x, y);
             }
+        }
+
+        public void Dispose() {
+            am.Close();
         }
     }
 }
