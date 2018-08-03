@@ -8,7 +8,11 @@ using SimpleSynth;
 
 namespace TetrisNet.Classes {
     public partial class Board {
-        private AudioMixer am;
+        // Music support provided by SimpleSynth:
+        // https://github.com/morphx666/PianoBizarre
+
+        private AudioMixer amMelody;
+        private AudioMixer amBeat;
 
         private struct ReleaseNote {
             public readonly long Tick;
@@ -21,20 +25,24 @@ namespace TetrisNet.Classes {
         }
 
         private void InitAudioService() {
-            am = new AudioMixerSlimDX();
+            amMelody = new AudioMixerSlimDX();
+            amBeat = new AudioMixerSlimDX();
 
             for(int i = 1; i <= 6; i++) { // note polyphony
                 // Multiple oscillators, panning and automation (SignalMixer)
-                am.BufferProviders.Add(CreateInstrument2());
+                amMelody.BufferProviders.Add(CreateInstrument2());
             }
-            am.Volume = 0.1;
+            amMelody.Volume = 0.1;
+
+            amBeat.BufferProviders.Add(CreateInstrument3());
+            amBeat.Volume = 0.1;
 
             Thread release = new Thread(() => {
                 while(true) {
                     Thread.Sleep(5);
 
-                    lock(am) {
-                        foreach(BufferProvider bp in am.BufferProviders) {
+                    lock(amMelody) {
+                        foreach(BufferProvider bp in amMelody.BufferProviders) {
                             if(bp.Frequency != 0) {
                                 ReleaseNote rn = (ReleaseNote)bp.Tag;
                                 if(DateTime.Now.Ticks >= rn.Tick) {
@@ -52,13 +60,13 @@ namespace TetrisNet.Classes {
         private SignalGenerator CreateInstrument1() {
             SignalGenerator sg = new SignalGenerator();
 
-            sg.Envelop.Attack = new Envelope.EnvelopePoint(1, 10);
-            sg.Envelop.Decay = new Envelope.EnvelopePoint(0.6, 10);
-            sg.Envelop.Sustain = new Envelope.EnvelopePoint(0.6, int.MaxValue);
-            sg.Envelop.Release = new Envelope.EnvelopePoint(0, 100);
+            //sg.Envelop.Attack = new Envelope.EnvelopePoint(1, 10);
+            //sg.Envelop.Decay = new Envelope.EnvelopePoint(0.6, 10);
+            //sg.Envelop.Sustain = new Envelope.EnvelopePoint(0.6, int.MaxValue);
+            //sg.Envelop.Release = new Envelope.EnvelopePoint(0, 100);
 
             sg.Volume = 0.5;
-            sg.WaveForm = Oscillator.WaveForms.Sinusoidal;
+            sg.WaveForm = Oscillator.WaveForms.SawTooth;
 
             return sg;
         }
@@ -113,9 +121,23 @@ namespace TetrisNet.Classes {
             return m;
         }
 
+        private SignalGenerator CreateInstrument3() {
+            SignalGenerator sg = new SignalGenerator();
+
+            sg.Envelop.Attack = new Envelope.EnvelopePoint(1, 0);
+            sg.Envelop.Decay = new Envelope.EnvelopePoint(1, 10);
+            sg.Envelop.Sustain = new Envelope.EnvelopePoint(1, 20);
+            sg.Envelop.Release = new Envelope.EnvelopePoint(0, 0);
+
+            sg.Volume = 0.3;
+            sg.WaveForm = Oscillator.WaveForms.Noise;
+
+            return sg;
+        }
+
         private void PlayNote(string note, int duration) {
-            lock(am) {
-                foreach(BufferProvider bp in am.BufferProviders) {
+            lock(amMelody) {
+                foreach(BufferProvider bp in amMelody.BufferProviders) {
                     if(bp.Frequency == 0) {
                         ReleaseNote rn = new ReleaseNote(note, duration);
                         bp.Note = note;

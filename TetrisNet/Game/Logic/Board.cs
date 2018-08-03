@@ -284,7 +284,8 @@ namespace TetrisNet.Classes {
         }
 
         public void Dispose() {
-            am.Close();
+            amMelody.Close();
+            amBeat.Close();
         }
     }
 }
