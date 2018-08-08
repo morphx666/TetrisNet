@@ -41,6 +41,9 @@ namespace TetrisNet.Classes {
         public bool[][] Blocks;
         public readonly PieceTypes Type;
 
+        private readonly Pen pd = new Pen(Color.Black);
+        private readonly Pen ph = new Pen(Color.FromArgb(128, Color.White), 2);
+
         public Piece(PieceTypes type, int blockWidth, int blockHeight) {
             BlockWidth = blockWidth;
             BlockHeight = blockHeight;
@@ -146,28 +149,27 @@ namespace TetrisNet.Classes {
         }
 
         public void Render(Graphics g) {
-            Brush b = new SolidBrush(Color);
-            Pen pd = new Pen(Color.Black);
-            Pen ph = new Pen(Color.FromArgb(128, Color.White), 2);
-            for(int x = 0; x < Blocks.Length; x++) {
-                for(int y = 0; y < Blocks.Length; y++) {
-                    if(Blocks[x][y]) {
-                        g.TranslateTransform(X, Y);
+            using(Brush b = new SolidBrush(Color)) {
+                for(int x = 0; x < Blocks.Length; x++) {
+                    for(int y = 0; y < Blocks.Length; y++) {
+                        if(Blocks[x][y]) {
+                            g.TranslateTransform(X, Y);
 
-                        g.FillRectangle(b, x * BlockWidth, y * BlockHeight, BlockWidth, BlockHeight);
+                            int x1 = x * BlockWidth;
+                            int y1 = y * BlockHeight;
 
-                        g.DrawLine(ph, x * BlockWidth + 2, y * BlockHeight + 2, x * BlockWidth + BlockWidth, y * BlockHeight + 2);
-                        g.DrawLine(ph, x * BlockWidth + BlockWidth, y * BlockHeight, x * BlockWidth + BlockWidth, y * BlockHeight + BlockHeight);
+                            g.FillRectangle(b, x1, y1, BlockWidth, BlockHeight);
 
-                        g.DrawRectangle(pd, x * BlockWidth, y * BlockHeight, BlockWidth, BlockHeight);
+                            g.DrawLine(ph, x1 + 2, y1 + 2,      x1 + BlockWidth, y1 + 2);
+                            g.DrawLine(ph, x1 + BlockWidth, y1, x1 + BlockWidth, y1 + BlockHeight);
 
-                        g.ResetTransform();
+                            g.DrawRectangle(pd, x1, y1, BlockWidth, BlockHeight);
+
+                            g.ResetTransform();
+                        }
                     }
                 }
             }
-            b.Dispose();
-            pd.Dispose();
-            ph.Dispose();
         }
 
         #region Pieces Creation

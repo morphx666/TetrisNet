@@ -46,7 +46,7 @@ namespace TetrisNet.Classes {
             BlockWidth = blockWidth;
             BlockHeight = blockHeight;
 
-            InitAudioService();
+            //InitAudioService();
 
             Cells = new Cell[GridWidth][];
             for(int x = 0; x < GridWidth; x++) {
@@ -97,7 +97,7 @@ namespace TetrisNet.Classes {
 
             Thread gameLoop = new Thread(() => {
                 ShowBanner($"LEVEL {gameLevel}");
-                StartThemeMusic();
+                //StartThemeMusic();
 
                 while(!gameOver) {
                     Thread.Sleep(gameLoopsDelays[gameLevel - 1]);
@@ -284,8 +284,8 @@ namespace TetrisNet.Classes {
         }
 
         public void Dispose() {
-            amMelody.Close();
-            amBeat.Close();
+            //amMelody.Close();
+            //amBeat.Close();
         }
     }
 }
