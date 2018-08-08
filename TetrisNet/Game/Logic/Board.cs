@@ -14,7 +14,7 @@ namespace TetrisNet.Classes {
         public int BlockWidth;
         public int BlockHeight;
 
-        private Piece activePiece;
+        private Tetromino activeTetromino;
         private readonly Form parent;
         private Random r = new Random();
         private int[] gameLoopsDelays = new int[] { 1000, 750, 500, 300, 150, 75 };
@@ -58,10 +58,10 @@ namespace TetrisNet.Classes {
 
                 switch(e.KeyCode) {
                     case Keys.Left:
-                        if(CanMove(Piece.Directions.Left)) activePiece.Move(Piece.Directions.Left);
+                        if(CanMove(Tetromino.Directions.Left)) activeTetromino.Move(Tetromino.Directions.Left);
                         break;
                     case Keys.Right:
-                        if(CanMove(Piece.Directions.Right)) activePiece.Move(Piece.Directions.Right);
+                        if(CanMove(Tetromino.Directions.Right)) activeTetromino.Move(Tetromino.Directions.Right);
                         break;
                     case Keys.Down:
                         MoveDown();
@@ -70,24 +70,24 @@ namespace TetrisNet.Classes {
                         Task.Run(() => { while(MoveDown()) Thread.Sleep(30); });
                         break;
                     case Keys.Up:
-                        activePiece.Move(Piece.Directions.Rotate);
+                        activeTetromino.Move(Tetromino.Directions.Rotate);
                         bool isOutOfBounds;
                         do {
                             isOutOfBounds = false;
-                            if(activePiece.X / BlockWidth + activePiece.Area.Left < 0) {
-                                activePiece.Move(Piece.Directions.Right);
+                            if(activeTetromino.X / BlockWidth + activeTetromino.Area.Left < 0) {
+                                activeTetromino.Move(Tetromino.Directions.Right);
                                 isOutOfBounds = true;
                             }
-                            if(activePiece.X / BlockWidth + activePiece.Area.Right >= GridWidth) {
-                                activePiece.Move(Piece.Directions.Left);
+                            if(activeTetromino.X / BlockWidth + activeTetromino.Area.Right >= GridWidth) {
+                                activeTetromino.Move(Tetromino.Directions.Left);
                                 isOutOfBounds = true;
                             }
-                            if(activePiece.Y / BlockHeight + activePiece.Area.Top < 0) {
-                                activePiece.Move(Piece.Directions.Down);
+                            if(activeTetromino.Y / BlockHeight + activeTetromino.Area.Top < 0) {
+                                activeTetromino.Move(Tetromino.Directions.Down);
                                 isOutOfBounds = true;
                             }
-                            if(activePiece.Y / BlockHeight + activePiece.Area.Bottom >= GridHeight) {
-                                activePiece.Move(Piece.Directions.Up);
+                            if(activeTetromino.Y / BlockHeight + activeTetromino.Area.Bottom >= GridHeight) {
+                                activeTetromino.Move(Tetromino.Directions.Up);
                                 isOutOfBounds = true;
                             }
                         } while(isOutOfBounds);
@@ -106,28 +106,28 @@ namespace TetrisNet.Classes {
             }) { IsBackground = true };
             gameLoop.Start();
 
-            AddNewRandomPiece();
+            AddNewRandomTetromino();
         }
 
-        private void AddNewRandomPiece() {
-            Array values = Enum.GetValues(typeof(Piece.PieceTypes));
-            Piece.PieceTypes t = (Piece.PieceTypes)r.Next(values.Length);
+        private void AddNewRandomTetromino() {
+            Array values = Enum.GetValues(typeof(Tetromino.TetrominoTypes));
+            Tetromino.TetrominoTypes t = (Tetromino.TetrominoTypes)r.Next(values.Length);
 
-            if(activePiece != null && activePiece.Type == t) t = (Piece.PieceTypes)r.Next(values.Length);
+            if(activeTetromino != null && activeTetromino.Type == t) t = (Tetromino.TetrominoTypes)r.Next(values.Length);
 
-            activePiece = new Piece(t, BlockWidth, BlockHeight);
-            activePiece.X = BlockWidth * (GridWidth - activePiece.Size) / 2;
-            activePiece.X -= activePiece.X % BlockWidth;
-            activePiece.Y -= activePiece.Area.Top * BlockHeight;
+            activeTetromino = new Tetromino(t, BlockWidth, BlockHeight);
+            activeTetromino.X = BlockWidth * (GridWidth - activeTetromino.Size) / 2;
+            activeTetromino.X -= activeTetromino.X % BlockWidth;
+            activeTetromino.Y -= activeTetromino.Area.Top * BlockHeight;
 
-            if(!CanMove(Piece.Directions.Down)) {
+            if(!CanMove(Tetromino.Directions.Down)) {
                 Task.Run(() => ShowBanner("GAME OVER", 5000));
                 gameOver = true;
             }
         }
 
-        private bool CanMove(Piece.Directions d) {
-            Piece tmp = (Piece)activePiece.Clone();
+        private bool CanMove(Tetromino.Directions d) {
+            Tetromino tmp = (Tetromino)activeTetromino.Clone();
             tmp.Move(d);
 
             if(tmp.X / BlockWidth + tmp.Area.Left < 0) return false;
@@ -144,21 +144,21 @@ namespace TetrisNet.Classes {
         }
 
         private bool MoveDown() {
-            if(activePiece == null) return false;
-            if(CanMove(Piece.Directions.Down)) {
-                activePiece.Move(Piece.Directions.Down);
+            if(activeTetromino == null) return false;
+            if(CanMove(Tetromino.Directions.Down)) {
+                activeTetromino.Move(Tetromino.Directions.Down);
                 return true;
             } else {
-                for(int x = activePiece.Area.Left; x <= activePiece.Area.Right; x++) {
-                    for(int y = activePiece.Area.Top; y <= activePiece.Area.Bottom; y++) {
-                        if(activePiece.Blocks[x][y]) {
-                            Cells[activePiece.X / BlockWidth + x][activePiece.Y / BlockHeight + y].Value = true;
-                            Cells[activePiece.X / BlockWidth + x][activePiece.Y / BlockHeight + y].Color = activePiece.Color;
+                for(int x = activeTetromino.Area.Left; x <= activeTetromino.Area.Right; x++) {
+                    for(int y = activeTetromino.Area.Top; y <= activeTetromino.Area.Bottom; y++) {
+                        if(activeTetromino.Blocks[x][y]) {
+                            Cells[activeTetromino.X / BlockWidth + x][activeTetromino.Y / BlockHeight + y].Value = true;
+                            Cells[activeTetromino.X / BlockWidth + x][activeTetromino.Y / BlockHeight + y].Color = activeTetromino.Color;
                         }
                     }
                 }
 
-                AddNewRandomPiece();
+                AddNewRandomTetromino();
                 Task.Run(() => CheckFullLines());
             }
             return false;
@@ -167,23 +167,23 @@ namespace TetrisNet.Classes {
         private void CheckFullLines() {
             suspendGameLoop = true;
 
-            bool lineContainsPieces = false;
+            bool lineContainsTetrominos = false;
             bool lineIsComplete = true;
 
             for(int y = GridHeight - 1; y >= 0; y--) {
-                lineContainsPieces = false;
+                lineContainsTetrominos = false;
                 lineIsComplete = true;
 
                 for(int x = 0; x < GridWidth; x++) {
                     if(Cells[x][y].Value) {
-                        lineContainsPieces = true;
+                        lineContainsTetrominos = true;
                     } else {
                         lineIsComplete = false;
-                        if(lineContainsPieces) break;
+                        if(lineContainsTetrominos) break;
                     }
                 }
 
-                if(!lineContainsPieces) {
+                if(!lineContainsTetrominos) {
                     break;
                 } else if(lineIsComplete) {
                     for(int x = 0; x < GridWidth; x++) {
@@ -192,13 +192,13 @@ namespace TetrisNet.Classes {
                     Thread.Sleep(250);
 
                     for(int y1 = y - 1; y1 >= 0; y1--) {
-                        lineContainsPieces = false;
+                        lineContainsTetrominos = false;
                         for(int x = 0; x < GridWidth; x++) {
                             Cells[x][y1 + 1] = Cells[x][y1];
-                            if(Cells[x][y1].Value) lineContainsPieces = true;
+                            if(Cells[x][y1].Value) lineContainsTetrominos = true;
                         }
                         Thread.Sleep(30);
-                        if(!lineContainsPieces) break;
+                        if(!lineContainsTetrominos) break;
                     }
 
                     linesCounter += 1;
@@ -242,11 +242,11 @@ namespace TetrisNet.Classes {
             g.TranslateTransform(x, y);
             g.BeginContainer();
 
-            bool lineContainsPieces;
+            bool lineContainsTetrominos;
             Pen pd = new Pen(Color.Black);
             Pen ph = new Pen(Color.FromArgb(128, Color.White), 2);
             for(y = GridHeight - 1; y >= 0; y--) {
-                lineContainsPieces = false;
+                lineContainsTetrominos = false;
                 for(x = 0; x < GridWidth; x++) {
                     if(Cells[x][y].Value) {
                         Brush b = new SolidBrush(Cells[x][y].Color);
@@ -258,18 +258,18 @@ namespace TetrisNet.Classes {
                         g.DrawRectangle(pd, x * BlockWidth, y * BlockHeight, BlockWidth, BlockHeight);
 
                         b.Dispose();
-                        lineContainsPieces = true;
+                        lineContainsTetrominos = true;
                     } else {
                         g.FillRectangle(bk, x * BlockWidth, y * BlockHeight, BlockWidth, BlockHeight);
                     }
                 }
-                if(!lineContainsPieces) break;
+                if(!lineContainsTetrominos) break;
             }
             pd.Dispose();
             ph.Dispose();
             bk.Dispose();
 
-            activePiece.Render(g);
+            activeTetromino.Render(g);
 
             if(showBanner) {
                 SizeF s = g.MeasureString(banner, gameFont);

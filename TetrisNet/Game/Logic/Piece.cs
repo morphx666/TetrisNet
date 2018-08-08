@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 
 namespace TetrisNet.Classes {
-    public class Piece : ICloneable {
-        public enum PieceTypes {
+    public class Tetromino : ICloneable {
+        public enum TetrominoTypes {
             Line,
             StraightL,
             InvertedL,
@@ -39,48 +35,48 @@ namespace TetrisNet.Classes {
         public readonly int BlockHeight;
         public readonly Color Color;
         public bool[][] Blocks;
-        public readonly PieceTypes Type;
+        public readonly TetrominoTypes Type;
 
         private readonly Pen pd = new Pen(Color.Black);
         private readonly Pen ph = new Pen(Color.FromArgb(128, Color.White), 2);
 
-        public Piece(PieceTypes type, int blockWidth, int blockHeight) {
+        public Tetromino(TetrominoTypes type, int blockWidth, int blockHeight) {
             BlockWidth = blockWidth;
             BlockHeight = blockHeight;
             Type = type;
 
             switch(type) {
-                case PieceTypes.Line:
+                case TetrominoTypes.Line:
                     Color = Color.Cyan;
                     Size = 4;
                     Blocks = CreateLine();
                     break;
-                case PieceTypes.StraightL:
+                case TetrominoTypes.StraightL:
                     Color = Color.Orange;
                     Size = 3;
                     Blocks = CreateStraightL();
                     break;
-                case PieceTypes.InvertedL:
+                case TetrominoTypes.InvertedL:
                     Color = Color.Blue;
                     Size = 3;
                     Blocks = CreateInvertedL();
                     break;
-                case PieceTypes.Square:
+                case TetrominoTypes.Square:
                     Color = Color.Yellow;
                     Size = 4;
                     Blocks = CreateSquare();
                     break;
-                case PieceTypes.StraightSkew:
+                case TetrominoTypes.StraightSkew:
                     Color = Color.Green;
                     Size = 3;
                     Blocks = CreateStraightSkew();
                     break;
-                case PieceTypes.InvertedSkew:
+                case TetrominoTypes.InvertedSkew:
                     Color = Color.Red;
                     Size = 3;
                     Blocks = CreateInvertedSkew();
                     break;
-                case PieceTypes.Triangle:
+                case TetrominoTypes.Triangle:
                     Color = Color.Purple;
                     Size = 3;
                     Blocks = CreateTriangle();
@@ -172,7 +168,7 @@ namespace TetrisNet.Classes {
             }
         }
 
-        #region Pieces Creation
+        #region Tetrominos Creation
         private bool[][] CreateLine() {
             // ◌◌◌◌
             // ●●●●
@@ -277,7 +273,7 @@ namespace TetrisNet.Classes {
         #endregion
 
         public object Clone() {
-            Piece p = new Piece(Type, BlockWidth, BlockHeight) {
+            Tetromino p = new Tetromino(Type, BlockWidth, BlockHeight) {
                 X = this.X,
                 Y = this.Y
             };
