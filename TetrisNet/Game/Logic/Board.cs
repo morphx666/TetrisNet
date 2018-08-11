@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,6 +10,7 @@ namespace TetrisNet.Classes {
         public int GridHeight;
         public int BlockWidth;
         public int BlockHeight;
+        public int Points = 0;
 
         private Tetromino activeTetromino;
         private readonly Form parent;
@@ -75,6 +73,7 @@ namespace TetrisNet.Classes {
                         break;
                     case Keys.Up:
                         activeTetromino.Move(Tetromino.Directions.Rotate);
+
                         bool isOutOfBounds;
                         do {
                             isOutOfBounds = false;
@@ -91,6 +90,10 @@ namespace TetrisNet.Classes {
                                 isOutOfBounds = true;
                             }
                             if(activeTetromino.Y / BlockHeight + activeTetromino.Area.Bottom >= GridHeight) {
+                                activeTetromino.Move(Tetromino.Directions.Up);
+                                isOutOfBounds = true;
+                            }
+                            if(IsOverlapping(activeTetromino)) {
                                 activeTetromino.Move(Tetromino.Directions.Up);
                                 isOutOfBounds = true;
                             }
@@ -127,6 +130,8 @@ namespace TetrisNet.Classes {
             if(!CanMove(Tetromino.Directions.Down)) {
                 Task.Run(() => ShowBanner("GAME OVER", 5000));
                 gameOver = true;
+            } else {
+                Points++;
             }
         }
 
@@ -138,13 +143,17 @@ namespace TetrisNet.Classes {
             if(tmp.X / BlockWidth + tmp.Area.Right > GridWidth - 1) return false;
             if(tmp.Y / BlockWidth + tmp.Area.Bottom > GridHeight - 1) return false;
 
-            for(int x = tmp.Area.Left; x <= tmp.Area.Right; x++) {
-                for(int y = tmp.Area.Top; y <= tmp.Area.Bottom; y++) {
-                    if(tmp.Blocks[x][y] && Cells[tmp.X / BlockWidth + x][tmp.Y / BlockHeight + y].Value) return false;
+            return !IsOverlapping(tmp);
+        }
+
+        private bool IsOverlapping(Tetromino t) {
+            for(int x = t.Area.Left; x <= t.Area.Right; x++) {
+                for(int y = t.Area.Top; y <= t.Area.Bottom; y++) {
+                    if(t.Blocks[x][y] && Cells[t.X / BlockWidth + x][t.Y / BlockHeight + y].Value) return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         private bool MoveDown() {
@@ -193,6 +202,7 @@ namespace TetrisNet.Classes {
                     for(int x = 0; x < GridWidth; x++) {
                         Cells[x][y].Color = Color.Black;
                     }
+                    Points += 10;
                     Thread.Sleep(250);
 
                     for(int y1 = y - 1; y1 >= 0; y1--) {
@@ -218,6 +228,10 @@ namespace TetrisNet.Classes {
                     y++;
                 }
             }
+
+            //TODO: Check if last line is empty, which would mean
+            //      the whole board has been cleared
+            //points += 100;
 
             suspendGameLoop = false;
         }
