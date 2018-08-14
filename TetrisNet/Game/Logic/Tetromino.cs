@@ -63,7 +63,7 @@ namespace TetrisNet.Classes {
                     break;
                 case TetrominoTypes.Square:
                     Color = Color.Yellow;
-                    Size = 4;
+                    Size = 3;
                     Blocks = CreateSquare();
                     break;
                 case TetrominoTypes.StraightSkew:
@@ -100,6 +100,7 @@ namespace TetrisNet.Classes {
                     Y -= BlockHeight;
                     break;
                 case Directions.Rotate:
+                    if(Type == TetrominoTypes.Square) break;
                     // https://www.geeksforgeeks.org/inplace-rotate-square-matrix-by-90-degrees/
                     for(int x = 0; x < Size / 2; x++) {
                         // Consider elements in group of matrixSize in 

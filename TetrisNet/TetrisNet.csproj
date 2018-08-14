@@ -47,7 +47,7 @@
   <ItemGroup>
     <Compile Include="Game\Audio\AudioSupport.cs" />
     <Compile Include="Game\Logic\Board.cs" />
-    <Compile Include="Game\Logic\Piece.cs" />
+    <Compile Include="Game\Logic\Tetromino.cs" />
     <Compile Include="Game\Audio\ThemeMusic.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace TetrisNet.Classes {
         public int BlockWidth;
         public int BlockHeight;
         public int Points = 0;
+        public readonly Dictionary<Tetromino.TetrominoTypes, int> Stats;
 
         private Tetromino activeTetromino;
         private readonly Form parent;
@@ -41,7 +43,7 @@ namespace TetrisNet.Classes {
             GridWidth = gridWidth;
             if(gridHeight == -1) {
                 GridHeight = parent.Height / blockHeight;
-                GridHeight -= 4;
+                //GridHeight -= 4;
             } else {
                 GridHeight = gridHeight;
             }
@@ -54,6 +56,8 @@ namespace TetrisNet.Classes {
             for(int x = 0; x < GridWidth; x++) {
                 Cells[x] = new Cell[GridHeight];
             }
+
+            Stats = new Dictionary<Tetromino.TetrominoTypes, int>();
 
             parent.KeyDown += (object s, KeyEventArgs e) => {
                 if(suspendGameLoop || gameOver) return;
@@ -75,21 +79,25 @@ namespace TetrisNet.Classes {
                         activeTetromino.Move(Tetromino.Directions.Rotate);
 
                         bool isOutOfBounds;
+                        int x;
+                        int y;
                         do {
                             isOutOfBounds = false;
-                            if(activeTetromino.X / BlockWidth + activeTetromino.Area.Left < 0) {
+                            x = activeTetromino.X / BlockWidth;
+                            y = activeTetromino.Y / blockHeight;
+                            if(x + activeTetromino.Area.Left < 0) {
                                 activeTetromino.Move(Tetromino.Directions.Right);
                                 isOutOfBounds = true;
                             }
-                            if(activeTetromino.X / BlockWidth + activeTetromino.Area.Right >= GridWidth) {
+                            if(x + activeTetromino.Area.Right >= GridWidth) {
                                 activeTetromino.Move(Tetromino.Directions.Left);
                                 isOutOfBounds = true;
                             }
-                            if(activeTetromino.Y / BlockHeight + activeTetromino.Area.Top < 0) {
+                            if(y + activeTetromino.Area.Top < 0) {
                                 activeTetromino.Move(Tetromino.Directions.Down);
                                 isOutOfBounds = true;
                             }
-                            if(activeTetromino.Y / BlockHeight + activeTetromino.Area.Bottom >= GridHeight) {
+                            if(y + activeTetromino.Area.Bottom >= GridHeight) {
                                 activeTetromino.Move(Tetromino.Directions.Up);
                                 isOutOfBounds = true;
                             }
@@ -121,6 +129,12 @@ namespace TetrisNet.Classes {
             Tetromino.TetrominoTypes t = (Tetromino.TetrominoTypes)r.Next(values.Length);
 
             if(activeTetromino != null && activeTetromino.Type == t) t = (Tetromino.TetrominoTypes)r.Next(values.Length);
+
+            if(Stats.ContainsKey(t)) {
+                Stats[t]++;
+            }  else {
+                Stats.Add(t, 1);
+            }
 
             activeTetromino = new Tetromino(t, BlockWidth, BlockHeight);
             activeTetromino.X = BlockWidth * (GridWidth - activeTetromino.Size) / 2;
