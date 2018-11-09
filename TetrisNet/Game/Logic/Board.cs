@@ -38,6 +38,8 @@ namespace TetrisNet.Classes {
 
         private readonly Cell[][] Cells;
 
+        private long lastKeyPressedAt = 0;
+
         public Board(Form parent, int gridWidth, int gridHeight = -1, int blockWidth = 16, int blockHeight = 16) {
             this.parent = parent;
             GridWidth = gridWidth;
@@ -62,6 +64,8 @@ namespace TetrisNet.Classes {
             parent.KeyDown += (object s, KeyEventArgs e) => {
                 if(suspendGameLoop || gameOver) return;
 
+                long curTicks = DateTime.Now.Ticks;
+
                 switch(e.KeyCode) {
                     case Keys.Left:
                         if(CanMove(Tetromino.Directions.Left)) activeTetromino.Move(Tetromino.Directions.Left);
@@ -73,7 +77,11 @@ namespace TetrisNet.Classes {
                         MoveDown();
                         break;
                     case Keys.Space:
+                        if(curTicks - lastKeyPressedAt < 10000000) return;
+                        lastKeyPressedAt = curTicks;
+
                         Task.Run(() => { while(MoveDown()) Thread.Sleep(30); });
+                        lastKeyPressedAt = curTicks + 1000000;
                         break;
                     case Keys.Up:
                         activeTetromino.Move(Tetromino.Directions.Rotate);
@@ -132,7 +140,7 @@ namespace TetrisNet.Classes {
 
             if(Stats.ContainsKey(t)) {
                 Stats[t]++;
-            }  else {
+            } else {
                 Stats.Add(t, 1);
             }
 
