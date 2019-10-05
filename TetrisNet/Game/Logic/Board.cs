@@ -79,9 +79,8 @@ namespace TetrisNet.Classes {
                     case Keys.Space:
                         if(curTicks - lastKeyPressedAt < 10000000) return;
                         lastKeyPressedAt = curTicks;
-
                         Task.Run(() => { while(MoveDown()) Thread.Sleep(30); });
-                        lastKeyPressedAt = curTicks + 1000000;
+                        lastKeyPressedAt = curTicks + 2000000;
                         break;
                     case Keys.Up:
                         activeTetromino.Move(Tetromino.Directions.Rotate);

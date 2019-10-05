@@ -21,10 +21,10 @@ namespace TetrisNet.Classes {
         }
 
         private void InitAudioService() {
-            amMelody = new AudioMixerSlimDX();
-            amBeat = new AudioMixerSlimDX();
+            amMelody = new AudioMixerNAudio();
+            amBeat = new AudioMixerNAudio();
 
-            for(int i = 1; i <= 6; i++) { // note polyphony
+            for (int i = 1; i <= 6; i++) { // note polyphony
                 // Multiple oscillators, panning and automation (SignalMixer)
                 //amMelody.BufferProviders.Add(CreateInstrument2());
 
